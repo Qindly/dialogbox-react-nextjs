@@ -1,0 +1,75 @@
+import { ChatMessage,Chat } from "@/types/chat";
+export type State = {
+  displayNavigation: boolean;
+  messageList: ChatMessage[];
+  streamingId: string;
+  selectedChat?:Chat;
+};
+
+export enum ActionType {
+  UPDATE = "UPDATE",
+  ADD_MESSAGE = "ADD_MESSAGE",
+  UPDATE_MESSAGE = "UPDATE_MESSAGE",
+  REMOVE_MESSAGE = "REMOVE_MESSAGE",
+}
+
+type MessageAction = {
+  type:
+    | ActionType.ADD_MESSAGE
+    | ActionType.UPDATE_MESSAGE
+    | ActionType.REMOVE_MESSAGE;
+  message: ChatMessage;
+};
+
+type UpdateAction = {
+  type: ActionType.UPDATE;
+  field: string;
+  value: unknown;
+};
+
+export type Action = UpdateAction | MessageAction;
+
+export const initState: State = {
+  displayNavigation: true,
+  messageList: [],
+  streamingId: "",
+};
+
+export function reducer(state: State, action: Action) {
+  switch (action.type) {
+    case ActionType.UPDATE:
+      return {
+        ...state,
+        [action.field]: action.value,
+      };
+    case ActionType.ADD_MESSAGE:
+      return {
+        ...state,
+        messageList: [...state.messageList, action.message],
+      };
+    case ActionType.UPDATE_MESSAGE: {
+      const messageList = state.messageList.map((message) => {
+        if (message.id === action.message.id) {
+          return action.message;
+        } else {
+          return message;
+        }
+      });
+      return {
+        ...state,
+        messageList,
+      };
+    }
+    case ActionType.REMOVE_MESSAGE: {
+      const messageList = state.messageList.filter(
+        (message) => message.id !== action.message.id
+      );
+      return {
+        ...state,
+        messageList,
+      };
+    }
+    default:
+      throw new Error();
+  }
+}

@@ -1,0 +1,188 @@
+/* myMain */
+.myMain {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-y: auto;
+  flex: 1;
+  height: 100%;
+  width: 100%;
+}
+
+
+/* mainPage */
+
+.MainPage {
+
+  overflow-y: auto;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  padding: 20px 10px;
+}
+
+.MainPage::-webkit-scrollbar-track {
+  background-color: transparent
+}
+
+.MainPage::-webkit-scrollbar-thumb {
+  background-color: #9b9b9b;
+  border-radius: 4px;
+}
+
+.MainPage::-webkit-scrollbar {
+  width: 10px;
+}
+
+.AskAvatar {
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+}
+
+.eachDialog {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ask */
+.ask {
+  display: flex;
+  max-width: 95%;
+  margin-top: 30px;
+  align-items: flex - start;
+  align-self: flex-end;
+}
+
+.askText {
+  margin-right: 10px;
+  border-radius: 20px;
+  padding: 10px 12px;
+  max-width: 90%;
+  word-wrap: break-word;
+  background-color: black;
+}
+
+/* reply */
+
+.reply {
+  display: flex;
+  flex-direction: column;
+  max-width: 95%;
+  display: flex;
+  margin-top: 30px;
+  align-items: flex - start;
+  align-self: flex-start;
+}
+
+.replyText {
+  margin-right: 10px;
+  border-radius: 20px;
+  padding: 10px 12px;
+  word-wrap: break-word;
+  background-color: rgb(80, 80, 80);
+}
+
+
+.replyFunction {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 10px;
+  padding: 1px 10px;
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+.earchReplyFunction {
+  display: flex;
+  align-items: center;
+}
+
+.replyFunctionImg {
+  margin-right: 5px;
+  width: 13px;
+  height: 13px;
+}
+
+
+/* Header */
+
+select {
+  width: 200px;
+  height: 30px;
+  background: #5a5a5a52;
+  color: white;
+  border: 0ch;
+}
+
+.Header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 10px 10px;
+  border-bottom: 2px solid #5a5a5a52;
+}
+
+.headerText {
+  margin-left: 10px;
+}
+
+.avatar {
+  position: absolute;
+  right: 12px;
+
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+}
+
+
+/* Footer */
+
+.footer {
+  display: flex;
+  border: solid 1px #858585;
+  flex-direction: column;
+  border-radius: 30px;
+  background-color: #333333;
+  position: sticky;
+  bottom: 25px;
+  right: 3px;
+  width: 98%;
+  display: flex;
+  align-items: flex-start;
+  margin: 8px;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+.askInput {
+  border: none;
+  width: 98%;
+  border: none;
+  height: 10px;
+  background: transparent;
+  font-size: 16px;
+  resize: none;
+  color: rgb(223, 223, 223);
+  resize: none;
+  overflow: auto;
+  white-space: normal;
+  word-wrap: break-word;
+  position: relative;
+}
+
+.askFunction {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-end;
+  margin-top: 0px;
+}
+
+.askFunctionImg {
+  height: 20px;
+  width: 20px;
+}
