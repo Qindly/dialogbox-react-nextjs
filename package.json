@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@azure/identity": "^4.6.0",
+    "@azure/openai": "^2.0.0",
+    "@coze/api": "^1.0.19",
     "@prisma/client": "^6.3.1",
     "next": "15.1.6",
     "react": "^19.0.0",

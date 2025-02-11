@@ -96,8 +96,7 @@ export default function ChatList() {
                   <ChatItem key={chat.id} chat={chat} isSelected={isSelected} />
                 );
               })}
-            </ul>
-          </div>
+            </ul>                </div>
         );
       })}
       <div ref={loadMoreRef}> &nbsp;more</div>
