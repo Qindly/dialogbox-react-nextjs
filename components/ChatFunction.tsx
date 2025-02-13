@@ -57,6 +57,7 @@ export function ChatFunctionProvider({ children }: { children: ReactNode }) {
         return;
       }
       const { data } = await response.json();
+      
       console.log("newdata:", data );
       if (!chatIdRef.current) {
         chatIdRef.current = data.message.chatId;
@@ -102,6 +103,7 @@ export function ChatFunctionProvider({ children }: { children: ReactNode }) {
       });
 
       if (!response.ok) {
+        console.log("response",response);
         console.log(response.statusText);
         return;
       }
