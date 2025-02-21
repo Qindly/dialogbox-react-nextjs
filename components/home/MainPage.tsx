@@ -4,8 +4,15 @@ import AIReply from "./AIReply";
 import { useContext, useEffect } from "react";
 import { AppContext } from "../AppContext";
 import { ActionType } from "@/reducers/AppReducer";
+import { CozeAPI } from "@coze/api";
 // import { ActionType } from "@/reducers/AppReducer";
-// import { ChatMessage } from "../../types/chat";
+// import { ConversationMessage } from "../../types/Conversation";
+
+const client = new CozeAPI({
+  token: process.env.NEXT_PUBLIC_COZE_API_TOKEN as string,
+  baseURL: process.env.NEXT_PUBLIC_COZE_API_BASE_URL as string,
+  allowPersonalAccessTokenInBrowser: true,
+});
 
 interface MainPageProps {
   avatarURL: string;
@@ -13,14 +20,12 @@ interface MainPageProps {
 
 export default function MainPage({ avatarURL }: MainPageProps) {
   const {
-    state: { messageList, streamingId, selectedChat },
+    state: { messageList, streamingId, selectedConversation },
     dispatch,
   } = useContext(AppContext);
 
-  async function getDate(chatId: string) {
-    const response = await fetch(`/api/message/list?chatId=${chatId}`, {
-      method: "GET",
-    });
+  async function getDate(ConversationId: string) {
+    const response = await client.get.getMessages(ConversationId);
     if (!response.ok) {
       console.log(response);
       return;
@@ -34,8 +39,8 @@ export default function MainPage({ avatarURL }: MainPageProps) {
   }
 
   useEffect(() => {
-    if (selectedChat) {
-      getDate(selectedChat.id);
+    if (selectedConversation) {
+      getDate(selectedConversation.id);
     } else {
       dispatch({
         type: ActionType.UPDATE,
@@ -43,7 +48,7 @@ export default function MainPage({ avatarURL }: MainPageProps) {
         value: [],
       });
     }
-  }, [selectedChat]);
+  }, [selectedConversation]);
 
   return (
     <div className="MainPage">

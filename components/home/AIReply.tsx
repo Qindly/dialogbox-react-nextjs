@@ -3,12 +3,12 @@ import { MdContentCopy, MdRefresh } from "react-icons/md";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useContext } from "react";
 import { AppContext } from "@/components/AppContext";
-import { ChatMessage } from "../../types/chat";
+import { Chat } from "../../types/Conversation";
 import { ActionType } from "@/reducers/AppReducer";
 import { ChatFunctionContext } from "@/components/ChatFunction";
 // import Markdown from "../common/Markdown";
 interface AIReplyProps {
-  message: ChatMessage;
+  message: Chat;
   need: boolean;
 }
 export default function AIReply({ message, need }: AIReplyProps) {

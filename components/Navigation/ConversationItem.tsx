@@ -1,5 +1,5 @@
 import { useEffect, useContext, useState } from "react";
-import { Chat } from "../../types/chat";
+import { Conversation } from "../../types/Conversation";
 import { AiOutlineEdit } from "react-icons/ai";
 import { MdCheck, MdClose, MdDeleteOutline } from "react-icons/md";
 import { PiChatBold } from "react-icons/pi";
@@ -7,15 +7,18 @@ import Button from "../common/Button";
 import { AppContext } from "../AppContext";
 import { ActionType } from "@/reducers/AppReducer";
 import { EventBusContext } from "../EventBusContext";
-type ChatItemProps = {
-  chat: Chat;
+type ConversationItemProps = {
+  conversation: Conversation;
   isSelected: boolean;
 };
 
-export default function ChatItem({ chat, isSelected }: ChatItemProps) {
+export default function ConversationItem({
+  conversation,
+  isSelected,
+}: ConversationItemProps) {
   const [modified, setModified] = useState(false);
   const [isdelete, setIsDelete] = useState(false);
-  const [title, setTitle] = useState(chat.title);
+  const [title, setTitle] = useState(conversation.title);
   const { dispatch } = useContext(AppContext);
   const { publish } = useContext(EventBusContext);
 
@@ -24,11 +27,11 @@ export default function ChatItem({ chat, isSelected }: ChatItemProps) {
     setIsDelete(false);
   }, [isSelected]);
 
-  async function updateChat() {
-    const response = await fetch("/api/chat/update", {
+  async function updateConversation() {
+    const response = await fetch("/api/conversation/update", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: chat.id, title }),
+      body: JSON.stringify({ id: conversation.id, title }),
     });
 
     if (!response.ok) {
@@ -37,16 +40,23 @@ export default function ChatItem({ chat, isSelected }: ChatItemProps) {
     }
     const { code } = await response.json();
     if (code === 0) {
-      publish("fetchChatList");
-      dispatch({ type: ActionType.UPDATE, field: "selectedChat", value: null });
+      publish("fetchConversationList");
+      dispatch({
+        type: ActionType.UPDATE,
+        field: "selectedConversation",
+        value: null,
+      });
     }
   }
 
-  async function deleteChat() {
-    const response = await fetch(`/api/chat/delete?id=${chat.id}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-    });
+  async function deleteConversation() {
+    const response = await fetch(
+      `/api/conversation/delete?id=${conversation.id}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
 
     if (!response.ok) {
       console.log(response.statusText);
@@ -54,19 +64,21 @@ export default function ChatItem({ chat, isSelected }: ChatItemProps) {
     }
     const { code } = await response.json();
     if (code === 0) {
-      publish("fetchChatList");
+      publish("fetchConversationList");
     }
   }
 
   return (
     <li
-      key={chat.id}
-      className={`chatLi   ${isSelected ? "selectedChatText" : ""}`}
+      key={conversation.id}
+      className={`conversationLi   ${
+        isSelected ? "selectedConversationText" : ""
+      }`}
       onClick={() => {
         dispatch({
           type: ActionType.UPDATE,
-          field: "selectedChat",
-          value: chat,
+          field: "selectedConversation",
+          value: conversation,
         });
       }}
     >
@@ -79,29 +91,29 @@ export default function ChatItem({ chat, isSelected }: ChatItemProps) {
       )}
       {modified ? (
         <input
-          className="chatItemInput"
+          className="conversationItemInput"
           value={title}
           onChange={(e) => {
             setTitle(e.target.value);
           }}
         />
       ) : (
-        <div className="chatText">{chat.title}</div>
+        <div className="conversationText">{conversation.title}</div>
       )}
       {isSelected && (
         <>
           {modified || isdelete ? (
-            <div className="chatItemTool">
+            <div className="conversationItemTool">
               <Button>
                 <MdCheck
                   className="icon"
                   onClick={() => {
                     if (modified) {
-                      console.log("updateChat");
-                      updateChat();
+                      console.log("updateConversation");
+                      updateConversation();
                     } else if (isdelete) {
-                      console.log("deleteChat");
-                      deleteChat();
+                      console.log("deleteConversation");
+                      deleteConversation();
                     }
                     setModified(false);
                     setIsDelete(false);
@@ -119,7 +131,7 @@ export default function ChatItem({ chat, isSelected }: ChatItemProps) {
               </Button>
             </div>
           ) : (
-            <div className="chatItemTool">
+            <div className="conversationItemTool">
               <Button>
                 <AiOutlineEdit
                   className="icon"

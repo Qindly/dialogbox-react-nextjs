@@ -1,4 +1,4 @@
-import { ChatMessage } from "../../types/chat";
+import { ChatMessage } from "../../types/Conversation";
 interface YouraskProps {
   message: ChatMessage;
   avatarURL: string;

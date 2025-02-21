@@ -1,9 +1,11 @@
-import { ChatMessage,Chat } from "@/types/chat";
+import { Chat, Conversation } from "@/types/Conversation";
+
+//state为整个app的状态
 export type State = {
   displayNavigation: boolean;
-  messageList: ChatMessage[];
+  messageList: Chat[];
   streamingId: string;
-  selectedChat?:Chat;
+  selectedConversation?: Conversation;
 };
 
 export enum ActionType {
@@ -13,14 +15,16 @@ export enum ActionType {
   REMOVE_MESSAGE = "REMOVE_MESSAGE",
 }
 
+//对于message的专门定义的action类型
 type MessageAction = {
   type:
     | ActionType.ADD_MESSAGE
     | ActionType.UPDATE_MESSAGE
     | ActionType.REMOVE_MESSAGE;
-  message: ChatMessage;
+  message: Chat;
 };
 
+//泛用型的update
 type UpdateAction = {
   type: ActionType.UPDATE;
   field: string;

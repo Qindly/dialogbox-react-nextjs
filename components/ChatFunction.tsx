@@ -9,9 +9,15 @@ import {
 } from "react";
 import { AppContext } from "./AppContext";
 import { ActionType } from "@/reducers/AppReducer";
-import { ChatMessage, MessageRequestBody } from "../types/chat";
+import { Chat, MessageRequestBody } from "@/types/Conversation";
 import { EventBusContext } from "./EventBusContext";
-// import { v4 as uuidv4 } from "uuid";
+import { CozeAPI, COZE_CN_BASE_URL, RoleType } from "@coze/api";
+
+const client = new CozeAPI({
+  token: process.env.NEXT_PUBLIC_COZE_API_TOKEN as string,
+  baseURL: COZE_CN_BASE_URL,
+  allowPersonalAccessTokenInBrowser: true,
+});
 
 interface ChatFunctionContextType {
   send: (messageText: string) => void;
@@ -24,27 +30,28 @@ export const ChatFunctionContext = createContext<ChatFunctionContextType>(
 );
 
 export function ChatFunctionProvider({ children }: { children: ReactNode }) {
+  // const streamingRef = useRef<AsyncIterableIterator<any> | null>(null);
   const stopRef = useRef(false);
-  const chatIdRef = useRef("");
+  const conversationIdRef = useRef("");
   const { publish } = useContext(EventBusContext);
   const {
-    state: { messageList, selectedChat },
+    state: { messageList, selectedConversation },
     dispatch,
   } = useContext(AppContext);
 
   useEffect(() => {
-    if (chatIdRef.current === selectedChat?.id) {
+    if (conversationIdRef.current === selectedConversation?.id) {
       return;
     }
-    chatIdRef.current = selectedChat?.id ?? "";
+    conversationIdRef.current = selectedConversation?.id ?? "";
     stopRef.current = true;
-  }, [selectedChat]);
+  }, [selectedConversation]);
 
   const stopsend = () => {
     stopRef.current = true;
   };
 
-  async function createOrUpdateMessage(message: ChatMessage) {
+  async function createOrUpdateMessage(message: Chat) {
     try {
       const response = await fetch("/api/message/update", {
         method: "POST",
@@ -57,16 +64,16 @@ export function ChatFunctionProvider({ children }: { children: ReactNode }) {
         return;
       }
       const { data } = await response.json();
-      
-      console.log("newdata:", data );
-      if (!chatIdRef.current) {
-        chatIdRef.current = data.message.chatId;
+
+      console.log("newdata:", data);
+      if (!conversationIdRef.current) {
+        conversationIdRef.current = data.message.conversationId;
         dispatch({
           type: ActionType.UPDATE,
-          field: "selectedChat",
-          value: {id:chatIdRef.current}
+          field: "selectedConversation",
+          value: { id: conversationIdRef.current },
         });
-        publish("fetchChatList");
+        publish("fetchconversationList");
       }
       return data.message;
     } catch (error) {
@@ -89,12 +96,11 @@ export function ChatFunctionProvider({ children }: { children: ReactNode }) {
   }
 
   const doSend = useCallback(
-    async (messages: ChatMessage[]) => {
+    async (messages: Chat[]) => {
       stopRef.current = false;
       const body: MessageRequestBody = { Allmessage: messages };
-      // setMessageText("");
       const controller = new AbortController();
-
+      // setMessageText("");
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -103,7 +109,7 @@ export function ChatFunctionProvider({ children }: { children: ReactNode }) {
       });
 
       if (!response.ok) {
-        console.log("response",response);
+        console.log("response", response);
         console.log(response.statusText);
         return;
       }
@@ -111,11 +117,12 @@ export function ChatFunctionProvider({ children }: { children: ReactNode }) {
         console.log("body error");
         return;
       }
-      const resMessage: ChatMessage = await createOrUpdateMessage({
+
+      const resMessage: Chat = await createOrUpdateMessage({
         id: "",
         role: "assistant",
         text: "",
-        chatId: chatIdRef.current,
+        conversationId: conversationIdRef.current,
       });
       dispatch({ type: ActionType.ADD_MESSAGE, message: resMessage });
       dispatch({
@@ -155,13 +162,13 @@ export function ChatFunctionProvider({ children }: { children: ReactNode }) {
 
   const send = useCallback(
     async (messageText: string) => {
-      const message: ChatMessage = await createOrUpdateMessage({
-        id: "",
+      const message: Chat = await createOrUpdateMessage({
+        id: "1",
         role: "user",
         text: messageText,
-        chatId: chatIdRef.current,
+        conversationId: conversationIdRef.current,
       });
-      const messages: ChatMessage[] = [...messageList, message];
+      const messages: Chat[] = [...messageList, message];
       dispatch({ type: ActionType.ADD_MESSAGE, message });
       doSend(messages);
     },
@@ -169,7 +176,7 @@ export function ChatFunctionProvider({ children }: { children: ReactNode }) {
   );
 
   const resend = useCallback(async () => {
-    const messages: ChatMessage[] = [...messageList];
+    const messages: Chat[] = [...messageList];
     const result = await deleteMessage(messageList[messageList.length - 1].id);
     if (!result) {
       console.log("delete message error");

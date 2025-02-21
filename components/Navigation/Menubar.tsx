@@ -16,7 +16,7 @@ export default function Menubar() {
   function createNewChat(){
     dispatch({
       type: ActionType.UPDATE,
-      field: "selectedChat",
+      field: "selectedConversation",
       value: null
     });
   }

@@ -2,16 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
-  const param = request.nextUrl.searchParams.get("page");
-  const page = param ? parseInt(param) : 1;
-  const list = await prisma.chat.findMany({
-    skip: (page - 1) * 15,
-    take: 15,
+  const chatId = request.nextUrl.searchParams.get("chatId");
+  if (!chatId) {
+    return NextResponse.json({ code: -1 });
+  }
+  const list = await prisma.message.findMany({
+    where: {
+      chatId,
+    },
     orderBy: {
-      updateTime: "desc",
+      updateTime: "asc",
     },
   });
-  const count = await prisma.chat.count();
-  const hasMore = count > page * 15;
-  return NextResponse.json({ code: 0, data: { list,hasMore } });
+  console.log("list", list);
+  return NextResponse.json({ code: 0, data: { list } });
 }

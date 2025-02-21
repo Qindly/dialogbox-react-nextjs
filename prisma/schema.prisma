@@ -4,23 +4,22 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-
 //npx prisma studio
 
-model Chat {
-  id         String    @id @default(uuid())
+model conversation {
+  id         String   @id @default(uuid())
   title      String
-  updateTime DateTime  @updatedAt
-  Message    Message[]
+  updateTime DateTime @updatedAt
+  chats      Chat[]
 }
 
-model Message {
-  id         String   @id @default(uuid())
-  text       String
-  role       String
-  updateTime DateTime @default(now())
-  chatId     String
-  chat       Chat     @relation(fields: [chatId], references: [id])
+model Chat {
+  id             String       @id @default(uuid())
+  text           String
+  role           String
+  updateTime     DateTime     @default(now())
+  conversationId String
+  conversation   conversation @relation(fields: [conversationId], references: [id])
 }
 
 generator client {

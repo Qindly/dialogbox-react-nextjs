@@ -1,8 +1,8 @@
-import { Chat } from "../../types/chat";
+import { Conversation } from "@/types/Conversation";
 const order = ["今天", "昨天", "前天", "一周内", "一个月内", "一个月外"];
-export function getChatByGroup(chatList: Chat[]) {
-  const groupMap = new Map<string, Chat[]>();
-  chatList.forEach((item) => {
+export function getConversationByGroup(ConversationList: Conversation[]) {
+  const groupMap = new Map<string, Conversation[]>();
+  ConversationList.forEach((item) => {
     const now = new Date();
     const updateDate = new Date(item.updateTime);
     let key = "未知时间";
