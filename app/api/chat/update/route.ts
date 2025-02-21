@@ -3,29 +3,30 @@ import prisma from "@/lib/prisma";
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { id, ...data } = body;
-  if (!data.chatId) {
-    const chat = await prisma.chat.create({
+  if (!data.conversationId) {
+    const conversation = await prisma.conversation.create({
       data: {
         title: "新对话",
       },
     });
-    data.chatId = chat.id;
-  } else {
-    await prisma.chat.update({
-      data: {
-        updateTime: new Date(),
-      },
-      where: {
-        id: data.chatId,
-      },
-    });
-  }
-  const message = await prisma.message.upsert({
+    data.conversationId = conversation.id;
+  } 
+  // else {
+  //   await prisma.chat.update({
+  //     data: {
+  //       updateTime: new Date(),
+  //     },
+  //     where: {
+  //       id: data.conversationId,
+  //     },
+  //   });
+  // }
+  const chat = await prisma.chat.upsert({
     create: data,
     update: data,
     where: {
       id,
     },
   });
-  return NextResponse.json({ code: 0, data: { message } });
+  return NextResponse.json({ code: 0, data: { chat } });
 }

@@ -6,7 +6,7 @@
 
 //npx prisma studio
 
-model conversation {
+model Conversation {
   id         String   @id @default(uuid())
   title      String
   updateTime DateTime @updatedAt
@@ -19,7 +19,7 @@ model Chat {
   role           String
   updateTime     DateTime     @default(now())
   conversationId String
-  conversation   conversation @relation(fields: [conversationId], references: [id])
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
 }
 
 generator client {

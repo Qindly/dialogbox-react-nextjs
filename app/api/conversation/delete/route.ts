@@ -5,16 +5,16 @@ export async function POST(request: NextRequest) {
   if (!id) {
     return NextResponse.json({ code: -1 });
   }
-  const deleteMessage = prisma.message.deleteMany({
+  const deleteChat = prisma.chat.deleteMany({
     where: {
-      chatId: id,
+      conversationId: id,
     },
   });
-  const deleteChat = prisma.chat.delete({
+  const deleteConversation = prisma.conversation.delete({
     where: {
       id,
     },
   });
-  await prisma.$transaction([deleteMessage, deleteChat]);
+  await prisma.$transaction([deleteChat, deleteConversation]);
   return NextResponse.json({ code: 0 });
 }

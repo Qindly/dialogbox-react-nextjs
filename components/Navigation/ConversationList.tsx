@@ -4,17 +4,10 @@ import { getConversationByGroup } from "../common/util";
 import ConversationItem from "./ConversationItem";
 import { EventBusContext } from "../EventBusContext";
 import { AppContext } from "../AppContext";
-import { CozeAPI } from "@coze/api";
 //在chatlist中，里面的每个chat是怎么渲染的，首先是定义一个chatList,这个用于存在chatlist页面时的数据
 //然后是定义一个groupList,这个用于存在chatlist页面时的数据
 //而chatlist里面的数据，是通过getData()函数来获取的
 //在data里面，就有个通过fetch来获取数据，从而获取到list
-
-const client = new CozeAPI({
-  token: process.env.NEXT_PUBLIC_COZE_API_TOKEN as string,
-  baseURL: process.env.NEXT_PUBLIC_COZE_API_BASE_URL as string,
-  allowPersonalAccessTokenInBrowser: true,
-});
 
 export default function ChatList() {
   const [ConversationList, setConversationList] = useState<Conversation[]>([]);
@@ -43,23 +36,28 @@ export default function ChatList() {
     } else {
       pageRef.current++;
     }
-    // const response = await client.conversations.messages.retrieve("1111");
-    // if (!response.ok) {
-    //   loadingRef.current = false;
-    //   console.log(response);
-    //   return;
-    // }
+    const response = await fetch(
+      `/api/conversation/list?page=${pageRef.current}`,
+      {
+        method: "GET",
+      }
+    );
+    if (!response.ok) {
+      loadingRef.current = false;
+      console.log(response);
+      return;
+    }
 
-    //   const { data } = await response.json();
-    //   hasMoreRef.current = data.hasMore;
-    //   console.log("pageRef", pageRef.current);
-    //   if (pageRef.current === 1 || reset) {
-    //     console.log("first");
-    //     setConversationList(data.list);
-    //   } else {
-    //     setConversationList((list) => list.concat(data.list));
-    //   }
-    //   loadingRef.current = false;
+    const { data } = await response.json();
+    hasMoreRef.current = data.hasMore;
+    console.log("pageRef", pageRef.current);
+    if (pageRef.current === 1 || reset) {
+      console.log("first");
+      setConversationList(data.list);
+    } else {
+      setConversationList((list) => list.concat(data.list));
+    }
+    loadingRef.current = false;
   }
 
   useEffect(() => {

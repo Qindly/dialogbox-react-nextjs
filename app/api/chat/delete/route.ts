@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
   if (!id) {
     return NextResponse.json({ code: -1 });
   }
-  await prisma.message.delete({
+  await prisma.chat.delete({
     where: {
       id,
     },

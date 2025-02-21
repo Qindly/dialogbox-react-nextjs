@@ -8,12 +8,12 @@ import { ActionType } from "@/reducers/AppReducer";
 import { ChatFunctionContext } from "@/components/ChatFunction";
 // import Markdown from "../common/Markdown";
 interface AIReplyProps {
-  message: Chat;
+  chat: Chat;
   need: boolean;
 }
-export default function AIReply({ message, need }: AIReplyProps) {
+export default function AIReply({ chat, need }: AIReplyProps) {
   const {
-    state: { messageList },
+    state: { chatList },
     dispatch,
   } = useContext(AppContext);
   const { resend } = useContext(ChatFunctionContext);
@@ -21,13 +21,13 @@ export default function AIReply({ message, need }: AIReplyProps) {
     resend();
   }
   function handleRemove() {
-    dispatch({ type: ActionType.REMOVE_MESSAGE, message: message });
+    dispatch({ type: ActionType.REMOVE_CHAT, chat: chat });
   }
   return (
     <>
       <div className="reply">
         <div className="replyText">
-          {`${message.text}${need && "!"}`}
+          {`${chat.text}${need && "!"}`}
           {/* <Markdown>{text}</Markdown> */}
         </div>
         <div className="replyFunction">
@@ -35,7 +35,7 @@ export default function AIReply({ message, need }: AIReplyProps) {
             <MdContentCopy className="replyFunctionImg" />
             <div>copy</div>
           </div>
-          {messageList[messageList.length - 1].id === message.id && (
+          {chatList[chatList.length - 1].id === chat.id && (
             <div onClick={handleRetry} className="earchReplyFunction">
               <MdRefresh className="replyFunctionImg" />
               <div>retry</div>

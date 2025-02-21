@@ -14,6 +14,6 @@ export interface Chat {
 }
 
 //定义chat中每个的聊天消息的请求体
-export interface MessageRequestBody {
-  Allmessage: ChatMessage[];
+export interface ChatRequestBody {
+  chats: Chat[];
 }

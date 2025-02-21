@@ -71,8 +71,8 @@ export default function ConversationItem({
   return (
     <li
       key={conversation.id}
-      className={`conversationLi   ${
-        isSelected ? "selectedConversationText" : ""
+      className={`chatLi   ${
+        isSelected ? "selectedChatText" : ""
       }`}
       onClick={() => {
         dispatch({
@@ -91,19 +91,19 @@ export default function ConversationItem({
       )}
       {modified ? (
         <input
-          className="conversationItemInput"
+          className="chatItemInput"
           value={title}
           onChange={(e) => {
             setTitle(e.target.value);
           }}
         />
       ) : (
-        <div className="conversationText">{conversation.title}</div>
+        <div className="chatText">{conversation.title}</div>
       )}
       {isSelected && (
         <>
           {modified || isdelete ? (
-            <div className="conversationItemTool">
+            <div className="chatItemTool">
               <Button>
                 <MdCheck
                   className="icon"
@@ -131,7 +131,7 @@ export default function ConversationItem({
               </Button>
             </div>
           ) : (
-            <div className="conversationItemTool">
+            <div className="chatItemTool">
               <Button>
                 <AiOutlineEdit
                   className="icon"

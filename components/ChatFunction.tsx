@@ -9,18 +9,11 @@ import {
 } from "react";
 import { AppContext } from "./AppContext";
 import { ActionType } from "@/reducers/AppReducer";
-import { Chat, MessageRequestBody } from "@/types/Conversation";
+import { Chat, ChatRequestBody } from "@/types/Conversation";
 import { EventBusContext } from "./EventBusContext";
-import { CozeAPI, COZE_CN_BASE_URL, RoleType } from "@coze/api";
-
-const client = new CozeAPI({
-  token: process.env.NEXT_PUBLIC_COZE_API_TOKEN as string,
-  baseURL: COZE_CN_BASE_URL,
-  allowPersonalAccessTokenInBrowser: true,
-});
 
 interface ChatFunctionContextType {
-  send: (messageText: string) => void;
+  send: (chatText: string) => void;
   resend: () => void;
   stopsend: () => void;
 }
@@ -35,7 +28,7 @@ export function ChatFunctionProvider({ children }: { children: ReactNode }) {
   const conversationIdRef = useRef("");
   const { publish } = useContext(EventBusContext);
   const {
-    state: { messageList, selectedConversation },
+    state: { chatList, selectedConversation },
     dispatch,
   } = useContext(AppContext);
 
@@ -51,12 +44,12 @@ export function ChatFunctionProvider({ children }: { children: ReactNode }) {
     stopRef.current = true;
   };
 
-  async function createOrUpdateMessage(message: Chat) {
+  async function createOrUpdateChat(chat: Chat) {
     try {
-      const response = await fetch("/api/message/update", {
+      const response = await fetch("/api/chat/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(message),
+        body: JSON.stringify(chat),
       });
 
       if (!response.ok) {
@@ -67,7 +60,7 @@ export function ChatFunctionProvider({ children }: { children: ReactNode }) {
 
       console.log("newdata:", data);
       if (!conversationIdRef.current) {
-        conversationIdRef.current = data.message.conversationId;
+        conversationIdRef.current = data.chat.conversationId;
         dispatch({
           type: ActionType.UPDATE,
           field: "selectedConversation",
@@ -75,14 +68,14 @@ export function ChatFunctionProvider({ children }: { children: ReactNode }) {
         });
         publish("fetchconversationList");
       }
-      return data.message;
+      return data.chat;
     } catch (error) {
-      console.error("Error in createOrUpdateMessage:", error);
+      console.error("Error in createOrUpdateChat:", error);
     }
   }
 
-  async function deleteMessage(id: string) {
-    const response = await fetch(`/api/message/delete?id=${id}`, {
+  async function deleteChat(id: string) {
+    const response = await fetch(`/api/chat/delete?id=${id}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
     });
@@ -96,12 +89,12 @@ export function ChatFunctionProvider({ children }: { children: ReactNode }) {
   }
 
   const doSend = useCallback(
-    async (messages: Chat[]) => {
+    async (chat: Chat[]) => {
       stopRef.current = false;
-      const body: MessageRequestBody = { Allmessage: messages };
+      const body: ChatRequestBody = { chats: chat };
       const controller = new AbortController();
-      // setMessageText("");
-      const response = await fetch("/api/chat", {
+      // setChatText("");
+      const response = await fetch("/api/conversation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
@@ -118,17 +111,17 @@ export function ChatFunctionProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const resMessage: Chat = await createOrUpdateMessage({
+      const resChat: Chat = await createOrUpdateChat({
         id: "",
         role: "assistant",
         text: "",
         conversationId: conversationIdRef.current,
       });
-      dispatch({ type: ActionType.ADD_MESSAGE, message: resMessage });
+      dispatch({ type: ActionType.ADD_CHAT, chat: resChat });
       dispatch({
         type: ActionType.UPDATE,
         field: "streamingId",
-        value: resMessage.id,
+        value: resChat.id,
       });
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -145,50 +138,50 @@ export function ChatFunctionProvider({ children }: { children: ReactNode }) {
         content += chunk;
         console.log(chunk);
         dispatch({
-          type: ActionType.UPDATE_MESSAGE,
-          message: { ...resMessage, text: content },
+          type: ActionType.UPDATE_CHAT,
+          chat: { ...resChat, text: content },
         });
       }
-      await createOrUpdateMessage({ ...resMessage, text: content });
+      await createOrUpdateChat({ ...resChat, text: content });
       dispatch({
         type: ActionType.UPDATE,
         field: "streamingId",
         value: "",
       });
-      // setMessageText("");
+      // setChatText("");
     },
     [dispatch, stopRef]
   );
 
   const send = useCallback(
-    async (messageText: string) => {
-      const message: Chat = await createOrUpdateMessage({
-        id: "1",
+    async (chatText: string) => {
+      const chat: Chat = await createOrUpdateChat({
+        id: "",
         role: "user",
-        text: messageText,
+        text: chatText,
         conversationId: conversationIdRef.current,
       });
-      const messages: Chat[] = [...messageList, message];
-      dispatch({ type: ActionType.ADD_MESSAGE, message });
-      doSend(messages);
+      const chats: Chat[] = [...chatList, chat];
+      dispatch({ type: ActionType.ADD_CHAT, chat });
+      doSend(chats);
     },
-    [messageList, dispatch, doSend]
+    [chatList, dispatch, doSend]
   );
 
   const resend = useCallback(async () => {
-    const messages: Chat[] = [...messageList];
-    const result = await deleteMessage(messageList[messageList.length - 1].id);
+    const chats: Chat[] = [...chatList];
+    const result = await deleteChat(chatList[chatList.length - 1].id);
     if (!result) {
-      console.log("delete message error");
+      console.log("delete chat error");
       return;
     }
     dispatch({
-      type: ActionType.REMOVE_MESSAGE,
-      message: messageList[messageList.length - 1],
+      type: ActionType.REMOVE_CHAT,
+      chat: chatList[chatList.length - 1],
     });
-    messages.splice(messages.length - 1, 1);
-    doSend(messages);
-  }, [messageList, dispatch, doSend]);
+    chats.splice(chats.length - 1, 1);
+    doSend(chats);
+  }, [chatList, dispatch, doSend]);
 
   return (
     <>

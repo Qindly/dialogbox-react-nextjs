@@ -3,25 +3,25 @@ import { Chat, Conversation } from "@/types/Conversation";
 //state为整个app的状态
 export type State = {
   displayNavigation: boolean;
-  messageList: Chat[];
+  chatList: Chat[];
   streamingId: string;
   selectedConversation?: Conversation;
 };
 
 export enum ActionType {
   UPDATE = "UPDATE",
-  ADD_MESSAGE = "ADD_MESSAGE",
-  UPDATE_MESSAGE = "UPDATE_MESSAGE",
-  REMOVE_MESSAGE = "REMOVE_MESSAGE",
+  ADD_CHAT = "ADD_CHAT",
+  UPDATE_CHAT = "UPDATE_CHAT",
+  REMOVE_CHAT = "REMOVE_CHAT",
 }
 
 //对于message的专门定义的action类型
-type MessageAction = {
+type ChatAction = {
   type:
-    | ActionType.ADD_MESSAGE
-    | ActionType.UPDATE_MESSAGE
-    | ActionType.REMOVE_MESSAGE;
-  message: Chat;
+    | ActionType.ADD_CHAT
+    | ActionType.UPDATE_CHAT
+    | ActionType.REMOVE_CHAT;
+  chat: Chat;
 };
 
 //泛用型的update
@@ -31,11 +31,11 @@ type UpdateAction = {
   value: unknown;
 };
 
-export type Action = UpdateAction | MessageAction;
+export type Action = UpdateAction | ChatAction;
 
 export const initState: State = {
   displayNavigation: true,
-  messageList: [],
+  chatList: [],
   streamingId: "",
 };
 
@@ -46,31 +46,31 @@ export function reducer(state: State, action: Action) {
         ...state,
         [action.field]: action.value,
       };
-    case ActionType.ADD_MESSAGE:
+    case ActionType.ADD_CHAT:
       return {
         ...state,
-        messageList: [...state.messageList, action.message],
+        chatList: [...state.chatList, action.chat],
       };
-    case ActionType.UPDATE_MESSAGE: {
-      const messageList = state.messageList.map((message) => {
-        if (message.id === action.message.id) {
-          return action.message;
+    case ActionType.UPDATE_CHAT: {
+      const chatList = state.chatList.map((chat) => {
+        if (chat.id === action.chat.id) {
+          return action.chat;
         } else {
-          return message;
+          return chat;
         }
       });
       return {
         ...state,
-        messageList,
+        chatList,
       };
     }
-    case ActionType.REMOVE_MESSAGE: {
-      const messageList = state.messageList.filter(
-        (message) => message.id !== action.message.id
+    case ActionType.REMOVE_CHAT: {
+      const chatList = state.chatList.filter(
+        (chat) => chat.id !== action.chat.id
       );
       return {
         ...state,
-        messageList,
+        chatList,
       };
     }
     default:

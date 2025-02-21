@@ -6,9 +6,9 @@ export async function GET(request: NextRequest) {
   if (!chatId) {
     return NextResponse.json({ code: -1 });
   }
-  const list = await prisma.message.findMany({
+  const list = await prisma.chat.findMany({
     where: {
-      chatId,
+      conversationId,
     },
     orderBy: {
       updateTime: "asc",
