@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
-  const chatId = request.nextUrl.searchParams.get("chatId");
-  if (!chatId) {
+  const conversationId = request.nextUrl.searchParams.get("conversationId");
+  if (!conversationId) {
     return NextResponse.json({ code: -1 });
   }
   const list = await prisma.chat.findMany({

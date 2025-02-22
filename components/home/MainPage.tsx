@@ -26,6 +26,7 @@ export default function MainPage({ avatarURL }: MainPageProps) {
       console.log(response);
       return;
     }
+    console.log("response:",response);
     const { data } = await response.json();
     dispatch({
       type: ActionType.UPDATE,

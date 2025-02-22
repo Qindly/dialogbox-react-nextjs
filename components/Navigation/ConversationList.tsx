@@ -62,7 +62,7 @@ export default function ChatList() {
 
   useEffect(() => {
     getDate(true);
-  }, []);
+  }, [ConversationList]);
 
   useEffect(() => {
     const callback = () => {
